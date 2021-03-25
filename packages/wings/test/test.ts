@@ -1,4 +1,5 @@
-import { WingsModule, WingsServer } from "../src/main";
+import { WingsModule } from "../src/common";
+import { WingsServer } from "../src/server";
 
 const server = new WingsServer();
 

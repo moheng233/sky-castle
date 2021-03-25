@@ -1,6 +1,6 @@
 import { Server as IOServer } from "socket.io";
 import { WingsServerConfig } from "./interfaces";
-import { WingsPeer } from "./main";
+import { WingsPeer } from "./common";
 export class WingsServer extends WingsPeer {
   ioserver: IOServer;
 
