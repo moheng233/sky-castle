@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "packages\\server"
+		},
+		{
+			"path": "packages\\client"
+		},
+		{
+			"path": "packages\\sky"
+		}
+	],
+	"settings": {
+		"typescript.tsdk": "node_modules\\typescript\\lib"
+	}
+}
