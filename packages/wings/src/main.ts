@@ -1,59 +1,71 @@
-import { Server as IOServer, ServerOptions as IOServerOptions } from "socket.io";
+import { WingsModuleRPC, WingsPeerStatus } from "./interfaces";
 
 /**
- * 服务端
+ * 对等体
  */
-export class WingsServer {
-    ioserver: IOServer;
+export abstract class WingsPeer {
+  modules: Map<string, WingsModule> = new Map();
 
-    modules: Map<string,typeof WingsModule> = new Map();
+  status: WingsPeerStatus = WingsPeerStatus.BEFROM;
 
-    constructor(public config: WingsServerConfig = {
-        port: 8080,
-        dir: "./",
-        ioconfig: undefined
-    }){
-        this.ioserver = new IOServer(this?.config?.ioconfig);
+  /**
+   * 执行本地的RPC调用
+   * @param moduleName
+   * @param RPCName
+   * @param data
+   * @returns
+   */
+  local_exec(moduleName: string, RPCName: string, data: any) {
+    let module = this.modules.get(moduleName);
+    if (module == undefined) {
+      throw new Error("不存在的模块");
     }
 
-    run(){
-        this.ioserver.listen(this.config.port);
-    }
+    return module.exec(RPCName, data);
+  }
 
-    module(name: string){
-        return (target: typeof WingsModule) => {
-            if(this.modules.has(name)){
-                throw new Error("重复的模块名称");
-            };
+  module(name: string) {
+    return (target: typeof WingsModule) => {
+      if (this.modules.has(name)) {
+        throw new Error("重复的模块名称");
+      }
 
-            this.modules.set(name,target);
-        }
-    }
+      this.modules.set(name, target.OBJECT);
+    };
+  }
 }
-
-export interface WingsServerConfig {
-    port: number;
-    dir: string;
-
-    ioconfig?: IOServerOptions
-}
-
-export type WingsModuleRPC = (data: any) => Promise<any>;
 
 /**
  * RPC调用的基本单位
  * 模块类
  */
 export class WingsModule {
-    functions: Map<string,WingsModuleRPC> = new Map();
+  static OBJECT = new WingsModule();
 
-    rpc(name?: string){
-        return (target: WingsModuleRPC, RPCName: string, descriptor: PropertyDescriptor) => {
-            if(this.functions.has(name ?? RPCName)){
-                throw new Error("重复的RPC调用名");
-            }
+  functions: Map<string, WingsModuleRPC> = new Map();
 
-            this.functions.set(name ?? RPCName,target);
-        }
+  exec(RPCName: string, data: any) {
+    let rpc = this.functions.get(RPCName);
+
+    if (rpc == undefined) {
+      throw new Error("不存在的调用");
+      return;
     }
+
+    return rpc(data);
+  }
+
+  rpc(name?: string) {
+    return (
+      target: WingsModuleRPC,
+      RPCName: string,
+      descriptor: PropertyDescriptor
+    ) => {
+      if (this.functions.has(name ?? RPCName)) {
+        throw new Error("重复的RPC调用名");
+      }
+
+      this.functions.set(name ?? RPCName, target);
+    };
+  }
 }
