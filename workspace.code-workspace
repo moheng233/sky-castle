@@ -8,9 +8,6 @@
 		},
 		{
 			"path": "packages\\client"
-		},
-		{
-			"path": "packages\\wings"
 		}
 	],
 	"settings": {
