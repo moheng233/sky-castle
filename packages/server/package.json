@@ -11,5 +11,11 @@
   "devDependencies": {
     "esno": "^0.5.0",
     "typescript": "^4.2.3"
+  },
+  "dependencies": {
+    "@nestjs/common": "^7.6.15",
+    "@nestjs/core": "^7.6.15",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^6.6.7"
   }
 }
